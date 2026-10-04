@@ -1,10 +1,14 @@
-// Generates neutral placeholder imagery in the KYNTRA palette so the app runs
-// and layouts are verifiable before real product photography is exported from
-// Figma.
+// Generates the flat app icon / splash / favicon fills.
 //
-// Every file here is a flat neutral fill. To use real assets, drop the exported
-// images into assets/images/products and assets/images/categories using the
-// same filenames — src/data/images.ts is the only file that references them.
+// Product, campaign, membership, profile and order artwork is all real
+// photography exported from Figma and must never be regenerated — see
+// src/data/images.ts for the provenance of every image. This script used to
+// also emit product and category placeholders, but a full audit of the Figma
+// file turned up real assets for all of them (and no category artwork at all),
+// so that half of the job is gone.
+//
+// Figma specifies no brand mark, so these stay neutral. Do not invent a KYNTRA
+// logo — drop the exported mark in over the top.
 const fs = require("fs");
 const path = require("path");
 const zlib = require("zlib");
@@ -60,7 +64,6 @@ function placeholderPng(w, h, hex, bandHex) {
     raw[o++] = 0; // filter: none
     const inBand = y >= bandTop;
     for (let x = 0; x < w; x++) {
-      // subtle vertical gradient so cards are visually distinguishable
       const t = y / h;
       const mix = inBand ? 0.18 : t * 0.1;
       raw[o++] = Math.round(r + (br - r) * mix);
@@ -78,67 +81,20 @@ function placeholderPng(w, h, hex, bandHex) {
 }
 
 const assetsRoot = path.join(__dirname, "..", "assets", "images");
+fs.mkdirSync(assetsRoot, { recursive: true });
 
-// Neutral ramp derived from the Figma palette so placeholders stay on-brand.
-const RAMP = [
-  ["#E5E5E5", "#D2D2D2"],
-  ["#F5F5F5", "#E5E5E5"],
-  ["#D8D8D8", "#BFBFBF"],
-  ["#EFEFEF", "#DDDDDD"],
-  ["#CFCFCF", "#B4B4B4"],
-  ["#E9E9E9", "#D4D4D4"],
-  ["#DCDCDC", "#C4C4C4"],
-  ["#F0F0F0", "#DEDEDE"],
+const INK = "#111111";
+
+const BRAND = [
+  ["icon.png", 1024, 1024, INK, INK],
+  ["adaptive-icon.png", 1024, 1024, INK, INK],
+  ["splash-icon.png", 512, 512, "#FFFFFF", "#FFFFFF"],
+  ["favicon.png", 48, 48, INK, INK],
 ];
 
-/**
- * Indices that hold real photography exported from Figma. Overwriting these
- * would destroy the only real product imagery in the project, so they are
- * skipped unless --force is passed.
- *
- * Note the real files are .jpg (Figma stores them as JPEG) while the
- * placeholders this script writes are .png. `check-assets.js` enforces that
- * each file's extension matches its bytes.
- *
- * See src/data/images.ts for the full provenance of every image.
- */
-const REAL = {
-  products: new Set([1, 2, 3, 4]), // Paceform 01, Formknit Tee, Driftline Short, Transit Crossbody
-  collection: new Set([1, 2, 3]), // the three editorial campaign banners
-};
-
-const force = process.argv.includes("--force");
-
-function emit(dir, prefix, count, [w, h]) {
-  const out = path.join(assetsRoot, dir);
-  fs.mkdirSync(out, { recursive: true });
-  const keep = REAL[dir] ?? new Set();
-  let skipped = 0;
-  for (let i = 0; i < count; i++) {
-    const n = i + 1;
-    if (keep.has(n) && !force) {
-      skipped++;
-      continue;
-    }
-    const [fill, band] = RAMP[i % RAMP.length];
-    const name = `${prefix}${n}.png`;
-    fs.writeFileSync(path.join(out, name), placeholderPng(w, h, fill, band));
-    console.log(`wrote ${dir}/${name} (${w}x${h})`);
-  }
-  if (skipped) {
-    console.log(`skipped ${skipped} real photo(s) in ${dir}/ (pass --force to overwrite)`);
-  }
+for (const [name, w, h, fill, band] of BRAND) {
+  fs.writeFileSync(path.join(assetsRoot, name), placeholderPng(w, h, fill, band));
+  console.log(`wrote ${name} (${w}x${h})`);
 }
 
-emit("products", "product-", 8, [480, 600]);
-emit("categories", "category-", 6, [400, 400]);
-emit("collection", "collection-", 3, [800, 500]);
-
-// App icon / splash. Replace once the Figma brand mark is exported — do not
-// invent a KYNTRA logo.
-const INK = "#111111";
-fs.writeFileSync(path.join(assetsRoot, "icon.png"), placeholderPng(1024, 1024, INK, INK));
-fs.writeFileSync(path.join(assetsRoot, "adaptive-icon.png"), placeholderPng(1024, 1024, INK, INK));
-fs.writeFileSync(path.join(assetsRoot, "splash-icon.png"), placeholderPng(512, 512, "#FFFFFF", "#FFFFFF"));
-fs.writeFileSync(path.join(assetsRoot, "favicon.png"), placeholderPng(48, 48, INK, INK));
-console.log("wrote app icon / splash / favicon");
+console.log("\nProduct and editorial artwork is real Figma photography and is not touched by this script.");

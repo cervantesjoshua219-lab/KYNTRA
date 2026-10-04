@@ -1,6 +1,7 @@
 import Feather from '@expo/vector-icons/Feather';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import type { ComponentProps } from 'react';
+import { memo } from 'react';
 import { StyleSheet } from 'react-native';
 
 import { colors } from '@/theme';
@@ -91,7 +92,25 @@ type Props = {
 type FeatherGlyph = ComponentProps<typeof Feather>['name'];
 type MaterialGlyph = ComponentProps<typeof MaterialCommunityIcons>['name'];
 
-export function Icon({ name, size = 24, color = colors.primary, filled = false, style, testID }: Props) {
+/**
+ * Memoized because icons are the most numerous component in the app — a single
+ * product card renders five for its star row — and each one mounts a glyph from
+ * a 200KB font. Without this, any state change in an ancestor re-renders every
+ * icon on screen.
+ *
+ * The `style` prop is intentionally absent from the comparison in spirit: it is
+ * usually an inline object, so a caller passing one gets a fresh identity each
+ * render and the memo misses. Keeping icon styling inside this file (see
+ * `styles.glyph`) avoids that.
+ */
+export const Icon = memo(function Icon({
+  name,
+  size = 24,
+  color = colors.primary,
+  filled = false,
+  style,
+  testID,
+}: Props) {
   if (name in MATERIAL) {
     return (
       <MaterialCommunityIcons
@@ -117,7 +136,7 @@ export function Icon({ name, size = 24, color = colors.primary, filled = false, 
       testID={testID}
     />
   );
-}
+});
 
 const styles = StyleSheet.create({
   glyph: {

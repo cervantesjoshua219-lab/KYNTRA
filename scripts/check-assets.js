@@ -1,12 +1,23 @@
 /**
- * Asset format check.
+ * Asset check.
  *
- * Verifies that every image in assets/ has a file extension matching its actual
- * bytes. This exists because of a bug that typecheck and lint could not catch:
- * the Figma MCP `download_figma_images` tool only accepts a `.png`, `.svg` or
- * `.gif` filename, but happily writes JPEG bytes under a `.png` name. Web
- * browsers sniff the content and render it anyway, so the web export looked
- * perfect while Android's stricter image decoder refused to load the file.
+ * Two failure modes, both of which typecheck and lint cannot catch:
+ *
+ * 1. **Format mismatch.** Every image in assets/ must have an extension matching
+ *    its actual bytes. The Figma MCP `download_figma_images` tool only accepts a
+ *    `.png`, `.svg` or `.gif` filename, but happily writes JPEG bytes under a
+ *    `.png` name. Web browsers sniff the content and render it anyway, so the
+ *    web export looked perfect while Android's stricter image decoder refused to
+ *    load the file.
+ *
+ * 2. **Unresolvable require().** A `require()` in `src/data/images.ts` that
+ *    points at a file which does not exist. Metro fails the *whole bundle* on an
+ *    unresolved asset, which reaches the user as a blank white screen after the
+ *    splash — no red box, no console error, because the module graph never
+ *    finished evaluating. This happened when the MCP wrote five downloads to
+ *    `assets/images/` while the registry pointed at `assets/images/membership/`
+ *    and friends. Worth catching statically: the failure is invisible until
+ *    someone runs it on a device.
  *
  * Run via `npm run check:assets`, or as part of `npm run verify`.
  */
@@ -14,7 +25,8 @@
 const fs = require('fs');
 const path = require('path');
 
-const assetsRoot = path.join(__dirname, '..', 'assets', 'images');
+const projectRoot = path.join(__dirname, '..');
+const assetsRoot = path.join(projectRoot, 'assets', 'images');
 
 /** extension -> list of accepted leading byte signatures */
 const SIGNATURES = {
@@ -62,7 +74,7 @@ for (const file of walk(assetsRoot)) {
   checked++;
   const bytes = fs.readFileSync(file).subarray(0, 16);
   const actual = detect(bytes);
-  const rel = path.relative(path.join(__dirname, '..'), file);
+  const rel = path.relative(projectRoot, file);
 
   if (!actual) {
     problems.push(`${rel}: unrecognised format`);
@@ -71,14 +83,50 @@ for (const file of walk(assetsRoot)) {
   }
 }
 
+// --- 2. every require() in the image registry must resolve -------------------
+// Scanned across all of src/ rather than just the registry, because a screen
+// importing artwork directly would fail the same way.
+const registryFile = path.join(projectRoot, 'src', 'data', 'images.ts');
+
+function sourceFiles(dir) {
+  return fs.readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory()) return sourceFiles(full);
+    return /\.tsx?$/.test(entry.name) ? [full] : [];
+  });
+}
+
+let referenced = 0;
+
+for (const file of sourceFiles(path.join(projectRoot, 'src'))) {
+  const source = fs.readFileSync(file, 'utf8');
+  const rel = path.relative(projectRoot, file);
+
+  for (const match of source.matchAll(/require\(\s*'([^']+)'\s*\)/g)) {
+    const spec = match[1];
+    if (!spec.startsWith('@/assets/')) continue;
+
+    referenced++;
+    const target = path.join(projectRoot, spec.replace(/^@\//, ''));
+    if (!fs.existsSync(target)) {
+      problems.push(`${rel}: require('${spec}') does not exist on disk`);
+    }
+  }
+}
+
 if (problems.length) {
-  console.error(`${problems.length} asset format problem(s):\n`);
+  console.error(`${problems.length} asset problem(s):\n`);
   for (const p of problems) console.error(`  ${p}`);
   console.error(
     '\nAndroid rejects a format/extension mismatch even though web browsers tolerate it.\n' +
-      'Rename the file to match its real format (JPEG photos should be .jpg).'
+      'Rename the file to match its real format (JPEG photos should be .jpg).\n' +
+      "An unresolved require() fails Metro's whole bundle, which shows up as a blank\n" +
+      'white screen on device with no error. Check the path in src/data/images.ts.'
   );
   process.exit(1);
 }
 
-console.log(`checked ${checked} image(s) — all extensions match their format`);
+console.log(
+  `checked ${checked} image(s) — all extensions match their format; ` +
+    `${referenced} asset require(s) resolve`
+);

@@ -41,7 +41,12 @@ export type Category = {
   name: string;
   /** Number of products, used for the tile subtitle. */
   count: number;
-  image: string;
+  /**
+   * Optional artwork. Figma has no category imagery anywhere in the file — the
+   * sport filters are text chips — so every live entry is `null`. Kept
+   * optional because the design system defines a category tile component.
+   */
+  image: string | null;
 };
 
 export type CartItem = {
