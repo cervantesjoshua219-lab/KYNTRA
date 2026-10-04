@@ -19,7 +19,7 @@ import { campaignImages, productPhotos } from './images';
  * The two products Figma shoots twice (Contour 02, Airweave Cap) carry both
  * angles so the detail gallery has more than one page to swipe.
  *
- * Colour options are deliberately restricted to the neutral Figma palette — the
+ * Colour options are deliberately restricted to the neutral Figma palette â€” the
  * design system defines no saturated product colours.
  */
 
@@ -39,6 +39,7 @@ export const products: Product[] = [
       'A lighter way forward. Responsive dual-density cushioning and breathable engineered mesh bring effortless comfort to daily miles and everything after.',
     price: 5490,
     category: 'Shoes',
+    sport: 'Running',
     images: [productPhotos.paceform01],
     sizes: ['38', '39', '40', '41', '42', '43', '44', '45'],
     colors: NEUTRALS,
@@ -56,6 +57,7 @@ export const products: Product[] = [
       'Dense jersey that holds its shape through repeated washes. Wide neck opening, straight body, sold singly.',
     price: 1790,
     category: 'Apparel',
+    sport: 'Training',
     images: [productPhotos.formknitTee],
     sizes: ['XS', 'S', 'M', 'L', 'XL'],
     colors: NEUTRALS,
@@ -67,12 +69,13 @@ export const products: Product[] = [
   {
     id: 'driftline-short',
     name: 'Driftline Short',
-    tagline: 'Running · Men',
+    tagline: 'Running Â· Men',
     description:
       'Lightweight running short with a bonded waistband and a zip pocket. Lined brief, quick-dry finish.',
     price: 2290,
     compareAtPrice: 2890,
     category: 'Apparel',
+    sport: 'Running',
     images: [productPhotos.driftlineShort],
     sizes: ['XS', 'S', 'M', 'L', 'XL'],
     colors: NEUTRALS,
@@ -89,6 +92,7 @@ export const products: Product[] = [
       'Compact crossbody with a magnetic front pocket and an adjustable webbing strap. Water-resistant recycled nylon.',
     price: 1490,
     category: 'Accessories',
+    sport: 'Lifestyle',
     images: [productPhotos.transitCrossbody],
     sizes: ['One size'],
     colors: NEUTRALS,
@@ -104,6 +108,7 @@ export const products: Product[] = [
       'A sculpted everyday trainer with a padded collar and a cupsole built for long days on your feet.',
     price: 4990,
     category: 'Shoes',
+    sport: 'Lifestyle',
     images: [productPhotos.contour02, productPhotos.contour02Alt],
     sizes: ['38', '39', '40', '41', '42', '43', '44', '45'],
     colors: NEUTRALS,
@@ -120,6 +125,7 @@ export const products: Product[] = [
       'Featherweight five-panel cap with a moisture-wicking band. Packs flat for days when the weather turns.',
     price: 990,
     category: 'Accessories',
+    sport: 'Running',
     images: [productPhotos.airweaveCap, productPhotos.airweaveCapAlt],
     sizes: ['One size'],
     colors: NEUTRALS,
@@ -131,18 +137,22 @@ export const products: Product[] = [
 
 /**
  * Sport filters, exactly as Figma's Home selection group spells them
- * (nodes `9:777`-`9:783`). These are text chips in the design — there is no
- * category artwork anywhere in the file — so they carry no image.
+ * (nodes `9:777`-`9:783`). These are text chips in the design â€” there is no
+ * category artwork anywhere in the file â€” so they carry no image.
  *
  * `image` stays in the type as `string | null` because the design system page
  * defines a category tile component; nothing on the live screens uses it yet.
  */
-export const categories: Category[] = [
-  { id: 'running', name: 'Running', count: 3, image: null },
-  { id: 'training', name: 'Training', count: 1, image: null },
-  { id: 'lifestyle', name: 'Lifestyle', count: 1, image: null },
-  { id: 'basketball', name: 'Basketball', count: 0, image: null },
-];
+export const SPORT_FILTERS = ['Running', 'Training', 'Lifestyle', 'Basketball'] as const;
+
+export const categories: Category[] = SPORT_FILTERS.map((name) => ({
+  id: name.toLowerCase(),
+  name,
+  // Counted from the catalogue rather than typed in. The hand-maintained
+  // numbers drifted out of step with the products and mislabelled the chips.
+  count: products.filter((p) => p.sport === name).length,
+  image: null,
+}));
 
 /**
  * Home editorial campaigns, in Figma's stacking order. Copy is verbatim from

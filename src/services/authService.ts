@@ -26,6 +26,12 @@ export type Credentials = {
 export type Session = {
   token: string;
   email: string;
+  /**
+   * Display name, used by Home's greeting (Figma `9:729` reads "Good morning,
+   * Alex."). Optional because sessions persisted before this field existed are
+   * still valid — the gate only checks `expiresAt` — so callers must fall back.
+   */
+  firstName?: string;
   /** Unix ms. */
   expiresAt: number;
 };
@@ -36,10 +42,21 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 /** 30 days — long enough that sessions don't expire mid-demo. */
 const SESSION_TTL = 30 * 24 * 60 * 60 * 1000;
 
-function makeSession(email: string): Session {
+/**
+ * Derives a display name from the email local-part, since sign-in only ever
+ * sees an address: `alex@kyntra.ph` -> `Alex`.
+ */
+function nameFromEmail(email: string): string {
+  const local = email.split('@')[0] ?? '';
+  const first = local.split(/[._-]/)[0] ?? '';
+  return first.charAt(0).toUpperCase() + first.slice(1);
+}
+
+function makeSession(email: string, firstName?: string): Session {
   return {
     token: `mock_${Math.random().toString(36).slice(2, 12)}`,
     email,
+    firstName: firstName?.trim() || nameFromEmail(email),
     expiresAt: Date.now() + SESSION_TTL,
   };
 }
@@ -79,7 +96,7 @@ export const authService = {
     if (password.length < 8) {
       throw new AuthError('Password must be at least 8 characters.');
     }
-    return makeSession(email.trim());
+    return makeSession(email.trim(), firstName);
   },
 
   /** Always succeeds unless the address is malformed — Figma shows only the sent state. */

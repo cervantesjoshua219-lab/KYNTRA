@@ -23,6 +23,12 @@ export type Product = {
   /** Original price, when the item is discounted. */
   compareAtPrice?: number;
   category: string;
+  /**
+   * Figma's Home sport filter (`9:777`-`9:783`): Running / Training /
+   * Lifestyle / Basketball. Separate from `category`, which is the Shop sheet's
+   * merchandise grouping (Shoes / Apparel / Accessories).
+   */
+  sport?: string;
   /** Local require() asset or remote URI. */
   images: string[];
   sizes: string[];

@@ -1,11 +1,11 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { ScrollView, View } from 'react-native';
 
 import { BottomSheet, Chip, FilterGroup } from '@/components/BottomSheet';
 import { Button } from '@/components/Button';
 import { Icon } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
-import { ProductGrid } from '@/components/ProductCard';
+import { ProductGridList } from '@/components/ProductCard';
 import { Text } from '@/components/Text';
 import { useAsync } from '@/hooks/useAsync';
 import { productService } from '@/services/productService';
@@ -13,7 +13,7 @@ import { colors, PAGE_MARGIN, spacing } from '@/theme';
 
 const TAB_BAR_CLEARANCE = 96;
 
-const CATEGORIES = ['All', 'Footwear', 'Apparel', 'Outerwear', 'Accessories'] as const;
+/** Figma 9:1437 sizes the sheet's category list to Shoes; the rest follows the data. */
 const SIZES = ['UK 6', 'UK 7', 'UK 8', 'UK 9', 'UK 10', 'UK 11', 'XS', 'S', 'M', 'L', 'XL'] as const;
 
 const SORT_OPTIONS = [
@@ -35,6 +35,19 @@ export default function Shop() {
   const [sizes, setSizes] = useState<string[]>([]);
 
   const all = useAsync(() => productService.listAll(), []);
+
+  /**
+   * Chips are derived from the catalogue rather than hardcoded.
+   *
+   * A hardcoded list next to independently-edited data is how the shoes became
+   * unreachable: the chips said "Footwear" while the products were categorised
+   * "Shoes", so selecting it matched nothing and the grid silently went empty.
+   * Deriving means a chip can never name a category that does not exist.
+   */
+  const categories = useMemo(() => {
+    const present = new Set((all.data ?? []).map((p) => p.category));
+    return ['All', ...Array.from(present).sort()];
+  }, [all.data]);
 
   const filtered = (all.data ?? [])
     .filter((p) => category === 'All' || p.category === category)
@@ -86,29 +99,32 @@ export default function Shop() {
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={{ paddingHorizontal: PAGE_MARGIN, gap: spacing.sm, paddingBottom: spacing.lg }}
       >
-        {CATEGORIES.map((c) => (
+        {categories.map((c) => (
           <Chip key={c} label={c} selected={category === c} onPress={() => setCategory(c)} />
         ))}
       </ScrollView>
 
-      <ScrollView contentContainerStyle={{ paddingBottom: TAB_BAR_CLEARANCE + spacing.xl }}>
-        <View style={{ paddingHorizontal: PAGE_MARGIN, paddingBottom: spacing.lg }}>
-          <Text variant="caption" tone="secondary">
-            {filtered.length} {filtered.length === 1 ? 'item' : 'items'} ·{' '}
-            {SORT_OPTIONS.find((s) => s.id === sort)?.label}
-          </Text>
-        </View>
-
-        {filtered.length ? (
-          <ProductGrid products={filtered} />
-        ) : (
+      <ProductGridList
+        products={filtered}
+        horizontalPadding={0}
+        width={172}
+        ListHeaderComponent={
+          <View style={{ paddingHorizontal: PAGE_MARGIN, paddingBottom: spacing.lg }}>
+            <Text variant="caption" tone="secondary">
+              {filtered.length} {filtered.length === 1 ? 'item' : 'items'} ·{' '}
+              {SORT_OPTIONS.find((s) => s.id === sort)?.label}
+            </Text>
+          </View>
+        }
+        ListEmptyComponent={
           <View style={{ padding: PAGE_MARGIN }}>
             <Text variant="body" tone="secondary">
               Nothing matches those filters.
             </Text>
           </View>
-        )}
-      </ScrollView>
+        }
+        contentContainerStyle={{ paddingBottom: TAB_BAR_CLEARANCE + spacing.xl }}
+      />
 
       <BottomSheet
         visible={filtersOpen}
@@ -134,7 +150,7 @@ export default function Shop() {
       >
         <FilterGroup
           title="Category"
-          options={CATEGORIES}
+          options={categories}
           selected={category === 'All' ? [] : [category]}
           onToggle={(value) => setCategory(category === value ? 'All' : value)}
         />

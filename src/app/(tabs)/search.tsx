@@ -4,7 +4,7 @@ import { ScrollView, TextInput, View } from 'react-native';
 
 import { Icon } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
-import { ProductGrid } from '@/components/ProductCard';
+import { ProductGridList } from '@/components/ProductCard';
 import { Text } from '@/components/Text';
 import { aiSearchService } from '@/services/aiSearchService';
 import { productService, trendingSearches } from '@/services/productService';
@@ -139,30 +139,37 @@ export default function Search() {
         </View>
       </View>
 
-      <ScrollView contentContainerStyle={{ paddingBottom: TAB_BAR_CLEARANCE + spacing.xl }}>
-        {searching ? (
-          <Text variant="body" tone="secondary" style={{ padding: PAGE_MARGIN }}>
-            Searching…
-          </Text>
-        ) : null}
-
-        {aiText ? (
-          <Text variant="body" style={{ padding: PAGE_MARGIN, paddingBottom: spacing.md }}>
-            {aiText}
-          </Text>
-        ) : null}
-
-        {hasQuery && !searching ? (
-          results.length ? (
-            <ProductGrid products={results} />
-          ) : (
+      {/* Results use a virtualized grid; the idle and searching states keep a
+          ScrollView because neither holds a list. Swapping the container rather
+          than nesting a grid inside a ScrollView keeps the rows recyclable. */}
+      {hasQuery && !searching ? (
+        <ProductGridList
+          products={results}
+          horizontalPadding={0}
+          width={172}
+          ListHeaderComponent={
+            aiText ? (
+              <Text variant="body" style={{ padding: PAGE_MARGIN, paddingBottom: spacing.md }}>
+                {aiText}
+              </Text>
+            ) : null
+          }
+          ListEmptyComponent={
             <View style={{ padding: PAGE_MARGIN }}>
               <Text variant="body" tone="secondary">
                 No results for “{query.trim()}”.
               </Text>
             </View>
-          )
-        ) : null}
+          }
+          contentContainerStyle={{ paddingBottom: TAB_BAR_CLEARANCE + spacing.xl }}
+        />
+      ) : (
+        <ScrollView contentContainerStyle={{ paddingBottom: TAB_BAR_CLEARANCE + spacing.xl }}>
+          {searching ? (
+            <Text variant="body" tone="secondary" style={{ padding: PAGE_MARGIN }}>
+              Searching…
+            </Text>
+          ) : null}
 
         {!hasQuery ? (
           <View style={{ padding: PAGE_MARGIN, gap: spacing.xl }}>
@@ -201,7 +208,8 @@ export default function Search() {
             </View>
           </View>
         ) : null}
-      </ScrollView>
+        </ScrollView>
+      )}
     </View>
   );
 }

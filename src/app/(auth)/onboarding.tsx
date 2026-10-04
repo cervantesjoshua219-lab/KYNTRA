@@ -13,8 +13,8 @@ import { useAuth } from '@/state';
 /**
  * Onboarding carousel — Figma "03 Onboarding" frames 9:318 / 9:343 / 9:368.
  *
- * Copy is taken from the frame names in Figma. Artwork uses the collection
- * placeholders until the real illustrations are exported.
+ * Copy is taken from the frame names in Figma. Artwork is real photography
+ * exported from the file (Home's three editorial campaigns).
  */
 const SLIDES = [
   {
@@ -75,7 +75,19 @@ export default function Onboarding() {
                 overflow: 'hidden',
               }}
             >
-              <Image source={item.image} />
+              {/* Sized to the frame. Without an explicit style the image lays
+                  out at its intrinsic 1024x1024 inside a ~312x390 box, so the
+                  parent clips it down to a meaningless zoomed crop. */}
+              {/* priority="high" because all three slides are above the fold and one swipe
+                  away. At the default "normal" the last slide's decode queues
+                  behind the first two and the user swipes to an empty box. */}
+              <Image
+                source={item.image}
+                style={{ width: '100%', height: '100%' }}
+                contentFit="cover"
+                cachePolicy="memory-disk"
+                priority="high"
+              />
             </View>
             <View style={{ gap: spacing.md }}>
               <Text variant="headline">{item.title}</Text>
