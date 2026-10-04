@@ -1,7 +1,7 @@
-# Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
-
-# dependencies
-node_modules/
+# Secrets — opencode.json may contain a FIGMA_API_KEY
+opencode.json
+.env
+.env.*
 
 # Expo
 .expo/
@@ -10,34 +10,24 @@ web-build/
 expo-env.d.ts
 
 # Native
-.kotlin/
-*.orig.*
-*.jks
-*.p8
-*.p12
-*.key
-*.mobileprovision
+ios/
+android/
 
-# Metro
-.metro-health-check*
+# Dependencies
+node_modules/
 
-# debug
+# Figma MCP downloaded images
+figma-images/
+
+# Logs
+*.log
 npm-debug.*
 yarn-debug.*
 yarn-error.*
 
-# macOS
+# OS / editor
 .DS_Store
 *.pem
-
-# local env files
-.env*.local
-
-# typescript
-*.tsbuildinfo
-
-example
-
-# generated native folders
-/ios
-/android
+.vscode/*
+!.vscode/extensions.json
+.idea/
