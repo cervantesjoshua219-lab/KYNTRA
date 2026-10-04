@@ -1,3 +1,4 @@
+import { ACCOUNT } from '@/data/account';
 import { delay } from '@/utils';
 
 /**
@@ -43,20 +44,17 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const SESSION_TTL = 30 * 24 * 60 * 60 * 1000;
 
 /**
- * Derives a display name from the email local-part, since sign-in only ever
- * sees an address: `alex@kyntra.ph` -> `Alex`.
+ * No stored profile exists to read a name from — `storageKeys.user` is written
+ * by `setProfile` but never hydrated — so the name defaults to the demo
+ * account. Sign-in cannot supply one (it only ever sees an address), and
+ * deriving "Alex" from `alex@kyntra.ph` is how the greeting came to disagree
+ * with the profile screen. Both now read `@/data/account`.
  */
-function nameFromEmail(email: string): string {
-  const local = email.split('@')[0] ?? '';
-  const first = local.split(/[._-]/)[0] ?? '';
-  return first.charAt(0).toUpperCase() + first.slice(1);
-}
-
 function makeSession(email: string, firstName?: string): Session {
   return {
     token: `mock_${Math.random().toString(36).slice(2, 12)}`,
     email,
-    firstName: firstName?.trim() || nameFromEmail(email),
+    firstName: firstName?.trim() || ACCOUNT.firstName,
     expiresAt: Date.now() + SESSION_TTL,
   };
 }

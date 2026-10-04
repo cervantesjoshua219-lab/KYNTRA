@@ -7,10 +7,10 @@ import { ProductGridList } from '@/components/ProductCard';
 import { EmptyState } from '@/components/Screen';
 import { Text } from '@/components/Text';
 import { products } from '@/data/products';
+import { useTabBarClearance } from '@/components/TabBar';
 import { useFavorites } from '@/state';
 import { colors, PAGE_MARGIN, spacing } from '@/theme';
 
-const TAB_BAR_CLEARANCE = 96;
 
 /**
  * Favorites — Figma "10 Favorites" page 9:4759, frames 9:2242 (populated) and
@@ -20,6 +20,7 @@ const TAB_BAR_CLEARANCE = 96;
  * one tap at a time and is the screen most likely to hold dozens of tiles.
  */
 export default function Favorites() {
+  const TAB_BAR_CLEARANCE = useTabBarClearance();
   const { ids, hydrating } = useFavorites();
 
   // ids are stored most-recent-first, so map in order rather than filtering the

@@ -9,9 +9,9 @@ import { ProductGridList } from '@/components/ProductCard';
 import { Text } from '@/components/Text';
 import { useAsync } from '@/hooks/useAsync';
 import { productService } from '@/services/productService';
+import { useTabBarClearance } from '@/components/TabBar';
 import { colors, PAGE_MARGIN, spacing } from '@/theme';
 
-const TAB_BAR_CLEARANCE = 96;
 
 /** Figma 9:1437 sizes the sheet's category list to Shoes; the rest follows the data. */
 const SIZES = ['UK 6', 'UK 7', 'UK 8', 'UK 9', 'UK 10', 'UK 11', 'XS', 'S', 'M', 'L', 'XL'] as const;
@@ -28,6 +28,7 @@ const SORT_OPTIONS = [
  * 9:1338 (filters, selected state) and 9:1437 (sort sheet).
  */
 export default function Shop() {
+  const TAB_BAR_CLEARANCE = useTabBarClearance();
   const [category, setCategory] = useState<string>('All');
   const [sort, setSort] = useState<(typeof SORT_OPTIONS)[number]['id']>('relevance');
   const [filtersOpen, setFiltersOpen] = useState(false);

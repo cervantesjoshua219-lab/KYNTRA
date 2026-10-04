@@ -12,12 +12,12 @@ import { Text } from '@/components/Text';
 import { useAsync } from '@/hooks/useAsync';
 import { membershipImage } from '@/data/images';
 import { productService } from '@/services/productService';
-import { useAuth, useOrders } from '@/state';
+import { useTabBarClearance } from '@/components/TabBar';
+import { useAuth, useOrders, useUser } from '@/state';
 import { colors, PAGE_MARGIN, radius, spacing } from '@/theme';
 import type { Product } from '@/types';
 
 /** Height reserved at the bottom so the floating tab bar never covers content. */
-const TAB_BAR_CLEARANCE = 96;
 
 /**
  * Home — Figma "04 Home" frames 9:593 (412x915), 9:655 (360x800) and 9:717
@@ -54,8 +54,10 @@ type Row =
   | { kind: 'shipping'; key: string };
 
 export default function Home() {
+  const TAB_BAR_CLEARANCE = useTabBarClearance();
   const { unreadCount } = useOrders();
   const { session } = useAuth();
+  const { firstName: accountFirstName } = useUser();
   const [sport, setSport] = useState<string | null>(null);
   const [campaign, setCampaign] = useState(0);
 
@@ -63,8 +65,11 @@ export default function Home() {
   const categories = useAsync(() => productService.getCategories(), []);
   const collections = useAsync(() => productService.getCollections(), []);
 
+  // The account name wins over the session's, because a session persisted
+  // before the account was renamed still carries the old firstName and would
+  // otherwise keep greeting the user by it indefinitely.
   const firstName =
-    session?.firstName?.trim() || session?.email?.split('@')[0] || 'there';
+    accountFirstName.trim() || session?.firstName?.trim() || 'there';
 
   // `?? []` would mint a new array on every render, which invalidates `rows`,
   // `renderRow` and every memoised tile below them. FlatList re-runs renderItem

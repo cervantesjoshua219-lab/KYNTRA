@@ -11,8 +11,8 @@ import type { CartLine } from '@/state';
 import { colors, PAGE_MARGIN, radius, spacing } from '@/theme';
 import { clamp, formatPrice } from '@/utils';
 import { FREE_SHIPPING_THRESHOLD } from '@/state/CartProvider';
+import { useTabBarClearance } from '@/components/TabBar';
 
-const TAB_BAR_CLEARANCE = 96;
 
 /**
  * Bag — Figma "08 Bag & Checkout" frames 9:1837 and 9:1865.
@@ -21,6 +21,7 @@ const TAB_BAR_CLEARANCE = 96;
  * running total.
  */
 export default function Bag() {
+  const TAB_BAR_CLEARANCE = useTabBarClearance();
   const { lines, count, totals, setQuantity, removeItem, isEmpty, hydrating, subtotal } = useCart();
 
   if (hydrating) {

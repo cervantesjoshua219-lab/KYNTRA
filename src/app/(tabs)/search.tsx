@@ -9,10 +9,10 @@ import { Text } from '@/components/Text';
 import { aiSearchService } from '@/services/aiSearchService';
 import { productService, trendingSearches } from '@/services/productService';
 import { readJson, storageKeys, writeJson } from '@/services/storage';
+import { useTabBarClearance } from '@/components/TabBar';
 import { colors, PAGE_MARGIN, radius, spacing } from '@/theme';
 import type { Product } from '@/types';
 
-const TAB_BAR_CLEARANCE = 96;
 
 type Mode = 'text' | 'ai' | 'scan';
 
@@ -21,6 +21,7 @@ type Mode = 'text' | 'ai' | 'scan';
  * 9:1226 and 9:1297 (results, empty and error states).
  */
 export default function Search() {
+  const TAB_BAR_CLEARANCE = useTabBarClearance();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<Product[]>([]);
   const [recent, setRecent] = useState<string[]>([]);

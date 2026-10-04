@@ -24,6 +24,23 @@ export const TABS = [
   { name: 'profile', label: 'You', icon: 'user', href: '/profile' },
 ] as const satisfies readonly { name: string; label: string; icon: IconName; href: Href }[];
 
+/** Height of the pill itself, excluding the padding and safe-area inset. */
+const BAR_HEIGHT = 60;
+
+/**
+ * Vertical space the floating bar occupies at the bottom of the screen.
+ *
+ * Screens must reserve this or their last row sits underneath the bar. It was
+ * hardcoded as `96` in six files, which happens to match a device with a ~24dp
+ * gesture inset and over-pads everything else — 84 on a device with no inset,
+ * and under-pads if the inset is taller. Derived from the same numbers the bar
+ * is drawn with, so the clearance is correct on every device.
+ */
+export function useTabBarClearance(): number {
+  const insets = useSafeAreaInsets();
+  return BAR_HEIGHT + spacing.md + Math.max(insets.bottom, spacing.md);
+}
+
 /** Renders the triggers a parent `<TabList asChild>` passes as children. */
 export function FloatingTabBar({ children }: { children: React.ReactNode }) {
   const insets = useSafeAreaInsets();
@@ -46,7 +63,7 @@ export function FloatingTabBar({ children }: { children: React.ReactNode }) {
         style={{
           flexDirection: 'row',
           alignItems: 'center',
-          height: 60,
+          height: BAR_HEIGHT,
           paddingHorizontal: spacing.sm,
           borderRadius: radius.nav,
           backgroundColor: colors.background,

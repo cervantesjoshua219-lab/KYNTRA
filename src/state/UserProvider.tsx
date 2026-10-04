@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
 
+import { ACCOUNT } from '@/data/account';
 import { readJson, storageKeys, writeJson } from '@/services/storage';
 import type { Address, PaymentMethod, Preferences } from '@/types';
 
@@ -64,9 +65,9 @@ type UserValue = {
 const UserContext = createContext<UserValue | null>(null);
 
 export function UserProvider({ children }: { children: ReactNode }) {
-  const [email, setEmail] = useState('alex.morgan@example.com');
-  const [firstName, setFirstName] = useState('Alex');
-  const [lastName, setLastName] = useState('Morgan');
+  const [email, setEmail] = useState<string>(ACCOUNT.email);
+  const [firstName, setFirstName] = useState<string>(ACCOUNT.firstName);
+  const [lastName, setLastName] = useState<string>(ACCOUNT.lastName);
   const [phone, setPhone] = useState<string | undefined>(undefined);
   const [membership, setMembership] = useState<UserValue['membership']>('member');
   const [addresses, setAddresses] = useState<Address[]>(DEFAULT_ADDRESSES);
