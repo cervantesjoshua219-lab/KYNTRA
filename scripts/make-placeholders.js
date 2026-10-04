@@ -96,6 +96,10 @@ const RAMP = [
  * would destroy the only real product imagery in the project, so they are
  * skipped unless --force is passed.
  *
+ * Note the real files are .jpg (Figma stores them as JPEG) while the
+ * placeholders this script writes are .png. `check-assets.js` enforces that
+ * each file's extension matches its bytes.
+ *
  * See src/data/images.ts for the full provenance of every image.
  */
 const REAL = {

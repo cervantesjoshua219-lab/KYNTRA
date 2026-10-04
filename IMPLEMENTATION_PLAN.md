@@ -290,10 +290,10 @@ The first four catalogue entries are now taken verbatim from the Shop grid
 
 | Product | Category line | Price | Badge | Image |
 |---|---|---|---|---|
-| Paceform 01 | Road running shoes | ₱5,490 | New | `product-1.png` (real) |
-| Formknit Tee | Training essentials | ₱1,790 | — | `product-2.png` (real) |
-| Driftline Short | Running · Men | ₱2,290 (was ₱2,890) | Sale | `product-3.png` (real) |
-| Transit Crossbody | Everyday accessories | ₱1,490 | — | `product-4.png` (real) |
+| Paceform 01 | Road running shoes | ₱5,490 | New | `product-1.jpg` (real) |
+| Formknit Tee | Training essentials | ₱1,790 | — | `product-2.jpg` (real) |
+| Driftline Short | Running · Men | ₱2,290 (was ₱2,890) | Sale | `product-3.jpg` (real) |
+| Transit Crossbody | Everyday accessories | ₱1,490 | — | `product-4.jpg` (real) |
 
 Seed order `KY-10482` reproduces frame `9:2533` exactly: those two products are a
 ₱7,280 subtotal, under the ₱8,000 threshold, so ₱150 delivery gives ₱7,430.
@@ -311,6 +311,8 @@ Seed order `KY-10482` reproduces frame `9:2533` exactly: those two products are 
 2. **Product and category imagery is only partly real.** Figma photographs just
    four products and no category tiles. `product-5..8.png` and all six
    `category-*.png` remain generated placeholders — see `src/data/images.ts`.
+   The real files are `.jpg` because Figma stores them as JPEG; `npm run
+   check:assets` fails the build if any extension disagrees with its bytes.
 3. **Catalogue is 13 products; Figma's Shop grid shows 12.** The extra entries are
    invented to fill the grid.
 4. **Figma PAT in `opencode.json`** is plaintext (gitignored). It was exposed in

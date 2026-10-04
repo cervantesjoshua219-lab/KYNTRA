@@ -10,6 +10,8 @@
     "web": "expo start --web",
     "lint": "expo lint",
     "typecheck": "tsc --noEmit",
+    "check:assets": "node ./scripts/check-assets.js",
+    "verify": "npm run typecheck && npm run lint && npm run check:assets",
     "placeholders": "node ./scripts/make-placeholders.js"
   },
   "dependencies": {
