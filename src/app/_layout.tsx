@@ -1,11 +1,40 @@
-import { Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold, Inter_800ExtraBold, useFonts } from '@expo-google-fonts/inter';
+import { useFonts } from 'expo-font';
 import { Redirect, Stack, useSegments } from 'expo-router';
+import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
+import { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { AppProviders, useAuth } from '@/state';
 import { colors } from '@/theme';
+
+/**
+ * The five Inter faces the design system uses, required individually.
+ *
+ * Deliberately not imported from the `@expo-google-fonts/inter` barrel: that
+ * package's index statically requires all 18 weights and styles, so a single
+ * import from it makes Metro bundle ~6MB of TTF when the app needs 5 faces
+ * (~1.6MB). In Expo Go those assets are fetched over HTTP from the dev server,
+ * so the 4.4MB of unused fonts is dead weight on every cold start.
+ *
+ * The object key becomes the font family name, which is what
+ * `src/theme/typography.ts` references.
+ */
+const FONT_ASSETS = {
+  Inter_400Regular: require('@expo-google-fonts/inter/400Regular/Inter_400Regular.ttf'),
+  Inter_500Medium: require('@expo-google-fonts/inter/500Medium/Inter_500Medium.ttf'),
+  Inter_600SemiBold: require('@expo-google-fonts/inter/600SemiBold/Inter_600SemiBold.ttf'),
+  Inter_700Bold: require('@expo-google-fonts/inter/700Bold/Inter_700Bold.ttf'),
+  Inter_800ExtraBold: require('@expo-google-fonts/inter/800ExtraBold/Inter_800ExtraBold.ttf'),
+};
+
+// Hold the native splash until the type system is ready. Without this the splash
+// hides as soon as JS mounts and exposes the `null` returned while fonts load,
+// which reads as a blank white screen. See the Expo font guide for SDK 57.
+SplashScreen.preventAutoHideAsync().catch(() => {
+  // Already hidden, or unsupported here. Nothing to do.
+});
 
 /**
  * Root layout: fonts, safe areas, global state, the route tree, and the auth
@@ -19,15 +48,30 @@ import { colors } from '@/theme';
  * in app.json is pinned to "light" for the same reason.
  */
 export default function RootLayout() {
-  const [fontsLoaded] = useFonts({
-    Inter_400Regular,
-    Inter_500Medium,
-    Inter_600SemiBold,
-    Inter_700Bold,
-    Inter_800ExtraBold,
-  });
+  const [fontsLoaded, fontError] = useFonts(FONT_ASSETS);
 
-  if (!fontsLoaded) return null;
+  useEffect(() => {
+    // Reveal the app once the fonts are ready *or* have definitively failed.
+    // Waiting on `loaded` alone would strand the splash forever on error.
+    if (fontsLoaded || fontError) {
+      SplashScreen.hideAsync().catch(() => {});
+    }
+  }, [fontsLoaded, fontError]);
+
+  useEffect(() => {
+    if (fontError) {
+      // Carry on with system fonts rather than showing nothing, but make the
+      // cause obvious instead of failing silently to a blank screen.
+      console.warn(
+        '[kyntra] Inter failed to load; falling back to the system typeface.',
+        fontError
+      );
+    }
+  }, [fontError]);
+
+  // Only block while the load is genuinely still in flight. The splash is
+  // covering this branch, so the user sees the branded loading screen.
+  if (!fontsLoaded && !fontError) return null;
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
