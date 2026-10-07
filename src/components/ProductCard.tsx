@@ -1,12 +1,12 @@
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { memo, useCallback } from 'react';
-import { FlatList, Pressable, View } from 'react-native';
+import { FlatList, Pressable, View, useWindowDimensions } from 'react-native';
 
 import { Icon } from '@/components/Icon';
 import { Text } from '@/components/Text';
 import { useFavorites } from '@/state';
-import { colors, radius, spacing } from '@/theme';
+import { colors, PAGE_MARGIN, radius, spacing } from '@/theme';
 import type { Product } from '@/types';
 import { formatPrice } from '@/utils';
 
@@ -210,16 +210,25 @@ export const ProductCard = memo(function ProductCard({
 /**
  * Static two-column grid. Prefer {@link ProductGridList} on any screen that can
  * hold more than a handful of rows — this renders every tile at once.
+ *
+ * Tiles size to the available width — `(screen − margins − gaps) ÷ columns` —
+ * so the grid always fills the page gutters instead of clipping or leaving a
+ * ragged right edge on devices that are not exactly 360dp wide.
  */
 export const ProductGrid = memo(function ProductGrid({
   products,
   gap = spacing.lg,
-  horizontalPadding = spacing.lg,
+  horizontalPadding = PAGE_MARGIN,
+  numColumns = 2,
 }: {
   products: Product[];
   gap?: number;
   horizontalPadding?: number;
+  numColumns?: number;
 }) {
+  const { width: windowWidth } = useWindowDimensions();
+  const columnWidth = (windowWidth - horizontalPadding * 2 - gap * (numColumns - 1)) / numColumns;
+
   return (
     <View
       style={{
@@ -230,7 +239,7 @@ export const ProductGrid = memo(function ProductGrid({
       }}
     >
       {products.map((p) => (
-        <ProductCard key={p.id} product={p} />
+        <ProductCard key={p.id} product={p} width={columnWidth} />
       ))}
     </View>
   );
@@ -248,12 +257,17 @@ export const ProductGrid = memo(function ProductGrid({
  * letting `FlatList` recycle rows, so only what is on screen is mounted.
  * `removeClippedSubviews` detaches off-screen tiles, which matters on Android
  * where a detached-but-mounted view still costs a layout pass.
+ *
+ * Tile width is derived from the window — `(screen − margins − gaps) ÷ columns` —
+ * instead of a hardcoded pixel value, and the grid shares the page's
+ * `PAGE_MARGIN` gutter, so tiles align with section headers and never leave a
+ * ragged right edge. Pass `width` only to opt out.
  */
 export function ProductGridList({
   products,
   gap = spacing.lg,
-  horizontalPadding = spacing.lg,
-  width = 172,
+  horizontalPadding = PAGE_MARGIN,
+  width,
   onEndReached,
   ListHeaderComponent,
   ListEmptyComponent,
@@ -270,9 +284,12 @@ export function ProductGridList({
   ListFooterComponent?: React.ComponentType | React.ReactElement | null;
   contentContainerStyle?: object;
 }) {
+  const { width: windowWidth } = useWindowDimensions();
+  const columnWidth = width ?? (windowWidth - horizontalPadding * 2 - gap) / 2;
+
   const renderItem = useCallback(
-    ({ item }: { item: Product }) => <ProductCard product={item} width={width} />,
-    [width]
+    ({ item }: { item: Product }) => <ProductCard product={item} width={columnWidth} />,
+    [columnWidth]
   );
 
   const keyExtractor = useCallback((item: Product) => item.id, []);

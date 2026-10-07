@@ -9,7 +9,7 @@ import { Text } from '@/components/Text';
 import { listProducts } from '@/services/db';
 import { useTabBarClearance } from '@/components/TabBar';
 import { useFavorites } from '@/state';
-import { colors, PAGE_MARGIN, spacing } from '@/theme';
+import { colors, spacing } from '@/theme';
 
 
 /**
@@ -42,10 +42,8 @@ export default function Favorites() {
     <View style={{ flex: 1, backgroundColor: colors.background }}>
       <ProductGridList
         products={saved}
-        horizontalPadding={0}
-        width={172}
         ListHeaderComponent={
-          <View style={{ paddingHorizontal: PAGE_MARGIN, paddingVertical: spacing.lg }}>
+          <View style={{ paddingVertical: spacing.lg }}>
             <Text variant="title">Saved</Text>
             {saved.length ? (
               <Text variant="caption" tone="secondary" style={{ marginTop: spacing.xs }}>

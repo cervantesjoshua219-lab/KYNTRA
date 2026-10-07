@@ -107,10 +107,8 @@ export default function Shop() {
 
       <ProductGridList
         products={filtered}
-        horizontalPadding={0}
-        width={172}
         ListHeaderComponent={
-          <View style={{ paddingHorizontal: PAGE_MARGIN, paddingBottom: spacing.lg }}>
+          <View style={{ paddingBottom: spacing.lg }}>
             <Text variant="caption" tone="secondary">
               {filtered.length} {filtered.length === 1 ? 'item' : 'items'} ·{' '}
               {SORT_OPTIONS.find((s) => s.id === sort)?.label}
@@ -118,7 +116,7 @@ export default function Shop() {
           </View>
         }
         ListEmptyComponent={
-          <View style={{ padding: PAGE_MARGIN }}>
+          <View style={{ paddingTop: PAGE_MARGIN }}>
             <Text variant="body" tone="secondary">
               Nothing matches those filters.
             </Text>

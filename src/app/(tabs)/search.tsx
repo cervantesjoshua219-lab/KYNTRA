@@ -146,17 +146,15 @@ export default function Search() {
       {hasQuery && !searching ? (
         <ProductGridList
           products={results}
-          horizontalPadding={0}
-          width={172}
           ListHeaderComponent={
             aiText ? (
-              <Text variant="body" style={{ padding: PAGE_MARGIN, paddingBottom: spacing.md }}>
+              <Text variant="body" style={{ paddingTop: PAGE_MARGIN, paddingBottom: spacing.md }}>
                 {aiText}
               </Text>
             ) : null
           }
           ListEmptyComponent={
-            <View style={{ padding: PAGE_MARGIN }}>
+            <View style={{ paddingTop: PAGE_MARGIN }}>
               <Text variant="body" tone="secondary">
                 No results for “{query.trim()}”.
               </Text>
