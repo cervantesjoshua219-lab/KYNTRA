@@ -2,11 +2,12 @@ import { useFonts } from 'expo-font';
 import { Redirect, Stack, useSegments } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { AppProviders, useAuth } from '@/state';
+import { initDatabase } from '@/services/db';
 import { colors } from '@/theme';
 
 /**
@@ -49,14 +50,31 @@ SplashScreen.preventAutoHideAsync().catch(() => {
  */
 export default function RootLayout() {
   const [fontsLoaded, fontError] = useFonts(FONT_ASSETS);
+  const [dbReady, setDbReady] = useState(false);
+
+  // Lab 05: open + seed the SQLite catalogue before anything renders, so a
+  // screen can never read an unseeded table or race the worker warm-up on web.
+  useEffect(() => {
+    let cancelled = false;
+    initDatabase()
+      .catch((error) => {
+        console.warn('[kyntra] SQLite failed to initialise; continuing without it.', error);
+      })
+      .finally(() => {
+        if (!cancelled) setDbReady(true);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     // Reveal the app once the fonts are ready *or* have definitively failed.
     // Waiting on `loaded` alone would strand the splash forever on error.
-    if (fontsLoaded || fontError) {
+    if ((fontsLoaded || fontError) && dbReady) {
       SplashScreen.hideAsync().catch(() => {});
     }
-  }, [fontsLoaded, fontError]);
+  }, [fontsLoaded, fontError, dbReady]);
 
   useEffect(() => {
     if (fontError) {
@@ -69,9 +87,9 @@ export default function RootLayout() {
     }
   }, [fontError]);
 
-  // Only block while the load is genuinely still in flight. The splash is
+  // Only block while the loads are genuinely still in flight. The splash is
   // covering this branch, so the user sees the branded loading screen.
-  if (!fontsLoaded && !fontError) return null;
+  if ((!fontsLoaded && !fontError) || !dbReady) return null;
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
@@ -90,6 +108,7 @@ export default function RootLayout() {
             <Stack.Screen name="product/[id]" />
             <Stack.Screen name="checkout" />
             <Stack.Screen name="orders" />
+            <Stack.Screen name="inventory" />
             <Stack.Screen name="settings" />
             <Stack.Screen name="notifications" />
             <Stack.Screen name="membership" />

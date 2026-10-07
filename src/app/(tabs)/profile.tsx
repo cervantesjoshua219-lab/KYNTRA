@@ -77,6 +77,20 @@ export default function Profile() {
         </ListGroup>
       </View>
 
+      {/* Added for Laboratory Exercise 05 — Figma has no stock-management
+          screen, so it gets its own group rather than a row tucked into
+          Account, and its own route rather than controls on the Shop grid. */}
+      <View style={{ paddingHorizontal: PAGE_MARGIN }}>
+        <ListGroup title="Stock">
+          <ListRow
+            label="Inventory"
+            detail="Add, search and remove catalogue items"
+            icon="grid"
+            onPress={() => router.push('/inventory')}
+          />
+        </ListGroup>
+      </View>
+
       <View style={{ paddingHorizontal: PAGE_MARGIN }}>
         <ListGroup title="Account">
           <ListRow

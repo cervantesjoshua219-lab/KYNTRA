@@ -1,4 +1,4 @@
-import { products } from '@/data/products';
+import { listProducts } from '@/services/db';
 import type { Product } from '@/types';
 import { delay } from '@/utils';
 
@@ -36,10 +36,11 @@ export const aiSearchService = {
       };
     }
 
-    const matched = products.filter((p) =>
+    const all = listProducts();
+    const matched = all.filter((p) =>
       [p.name, p.tagline, p.category].some((f) => f.toLowerCase().includes(q)),
     );
-    const results = matched.length ? matched : products.filter((p) => p.featured).slice(0, 4);
+    const results = matched.length ? matched : all.filter((p) => p.featured).slice(0, 4);
 
     return {
       text: matched.length
@@ -55,6 +56,6 @@ export const aiSearchService = {
    */
   async scanBarcode(): Promise<Product | null> {
     await delay(null, 900);
-    return products[0] ?? null;
+    return listProducts()[0] ?? null;
   },
 };

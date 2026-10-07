@@ -8,7 +8,7 @@ import { Icon } from '@/components/Icon';
 import { Badge } from '@/components/ProductCard';
 import { Divider, EmptyState } from '@/components/Screen';
 import { Text } from '@/components/Text';
-import { products } from '@/data/products';
+import { listProducts } from '@/services/db';
 import { useOrders } from '@/state';
 import { colors, PAGE_MARGIN, radius, spacing } from '@/theme';
 import { formatPrice, relativeTime } from '@/utils';
@@ -37,8 +37,10 @@ export default function OrderDetail() {
     );
   }
 
+  // Read once; the flatMap below runs per order line.
+  const catalogue = listProducts();
   const items = order.items.flatMap((item) => {
-    const product = products.find((p) => p.id === item.productId);
+    const product = catalogue.find((p) => p.id === item.productId);
     return product ? [{ ...item, product }] : [];
   });
 

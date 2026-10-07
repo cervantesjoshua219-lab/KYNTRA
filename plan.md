@@ -5,8 +5,8 @@ You are the lead senior React Native / Expo mobile engineer responsible for impl
 Your job is to turn my existing Figma design into a fully functional, production-quality Android mobile application using React Native + Expo + TypeScript.
 
 ==================================================
-1. PROJECT INFORMATION
-==================================================
+
+1. # PROJECT INFORMATION
 
 Application name:
 KYNTRA
@@ -45,8 +45,7 @@ Do not create a generic e-commerce template.
 
 The final application must visually and structurally follow the existing KYNTRA Figma design as closely as technically possible.
 
-==================================================
-2. PRIMARY OBJECTIVE
+================================================== 2. PRIMARY OBJECTIVE
 ==================================================
 
 Build the complete KYNTRA mobile application from the existing Figma design.
@@ -84,8 +83,7 @@ The application must:
 
 This is an implementation project, not a design-generation project.
 
-==================================================
-3. IMPORTANT RULE: INSPECT BEFORE CODING
+================================================== 3. IMPORTANT RULE: INSPECT BEFORE CODING
 ==================================================
 
 DO NOT immediately start generating code.
@@ -114,8 +112,7 @@ Preserve useful existing code.
 
 Only modify or replace files when necessary.
 
-==================================================
-4. FIGMA SOURCE OF TRUTH
+================================================== 4. FIGMA SOURCE OF TRUTH
 ==================================================
 
 The Figma design is the source of truth for:
@@ -153,8 +150,7 @@ Do not invent a different visual design unless the Figma design does not specify
 
 When a Figma value is available, use the Figma value instead of guessing.
 
-==================================================
-5. FIGMA INSPECTION
+================================================== 5. FIGMA INSPECTION
 ==================================================
 
 Before implementing screens, inspect the Figma file as thoroughly as possible.
@@ -183,6 +179,7 @@ Identify:
 Create an internal implementation map such as:
 
 SCREEN
+
 - Figma frame
 - React Native screen
 - Route
@@ -214,8 +211,7 @@ Do not assume these exact routes if the Figma structure suggests a better struct
 
 Use the Figma structure as the basis.
 
-==================================================
-6. IF FIGMA MCP IS AVAILABLE
+================================================== 6. IF FIGMA MCP IS AVAILABLE
 ==================================================
 
 If a Figma MCP connection is available in the current OpenCode environment:
@@ -236,8 +232,7 @@ Use the provided Figma URL and any available exported design information, screen
 
 Do not invent Figma specifications that you cannot verify.
 
-==================================================
-7. CREATE A DESIGN SYSTEM
+================================================== 7. CREATE A DESIGN SYSTEM
 ==================================================
 
 Before implementing all screens, create a centralized KYNTRA design system.
@@ -256,6 +251,7 @@ Do not scatter arbitrary visual values throughout the application.
 For example:
 
 colors
+
 - background
 - surface
 - text
@@ -267,6 +263,7 @@ colors
 - warning
 
 typography
+
 - display
 - heading
 - title
@@ -276,6 +273,7 @@ typography
 - price
 
 spacing
+
 - xs
 - sm
 - md
@@ -284,6 +282,7 @@ spacing
 - xxl
 
 radius
+
 - small
 - medium
 - large
@@ -291,8 +290,7 @@ radius
 
 Use the actual Figma values whenever they are available.
 
-==================================================
-8. REUSABLE COMPONENT ARCHITECTURE
+================================================== 8. REUSABLE COMPONENT ARCHITECTURE
 ==================================================
 
 Build reusable components instead of duplicating UI.
@@ -349,8 +347,7 @@ Do not create unnecessary abstractions.
 
 Components must be configurable through props.
 
-==================================================
-9. NAVIGATION
+================================================== 9. NAVIGATION
 ==================================================
 
 Use Expo Router if the existing project supports it or if introducing it is appropriate.
@@ -360,50 +357,49 @@ Create a clean navigation structure.
 Potential structure:
 
 app/
-├── _layout.tsx
+├── \_layout.tsx
 ├── index.tsx
 ├── (auth)/
-│   ├── _layout.tsx
-│   ├── login.tsx
-│   ├── register.tsx
-│   └── forgot-password.tsx
+│ ├── \_layout.tsx
+│ ├── login.tsx
+│ ├── register.tsx
+│ └── forgot-password.tsx
 │
 ├── (tabs)/
-│   ├── _layout.tsx
-│   ├── index.tsx
-│   ├── shop.tsx
-│   ├── search.tsx
-│   ├── bag.tsx
-│   └── profile.tsx
+│ ├── \_layout.tsx
+│ ├── index.tsx
+│ ├── shop.tsx
+│ ├── search.tsx
+│ ├── bag.tsx
+│ └── profile.tsx
 │
 ├── product/
-│   └── [id].tsx
+│ └── [id].tsx
 │
 ├── category/
-│   └── [id].tsx
+│ └── [id].tsx
 │
 ├── checkout/
-│   ├── index.tsx
-│   ├── address.tsx
-│   ├── payment.tsx
-│   └── review.tsx
+│ ├── index.tsx
+│ ├── address.tsx
+│ ├── payment.tsx
+│ └── review.tsx
 │
 ├── orders/
-│   ├── index.tsx
-│   └── [id].tsx
+│ ├── index.tsx
+│ └── [id].tsx
 │
 ├── settings/
-│   └── index.tsx
+│ └── index.tsx
 │
 └── help/
-    └── index.tsx
+└── index.tsx
 
 Adjust this structure to the actual Figma design.
 
 Do not force screens that don't exist in the design.
 
-==================================================
-10. BOTTOM NAVIGATION
+================================================== 10. BOTTOM NAVIGATION
 ==================================================
 
 If the Figma design uses bottom navigation, reproduce it accurately.
@@ -422,8 +418,7 @@ The navigation should:
 
 Do not use arbitrary icons when the Figma design provides specific icons.
 
-==================================================
-11. RESPONSIVE DESIGN
+================================================== 11. RESPONSIVE DESIGN
 ==================================================
 
 The application must work on:
@@ -458,8 +453,7 @@ Buttons should remain usable.
 
 Cards should not break at smaller widths.
 
-==================================================
-12. HOME SCREEN
+================================================== 12. HOME SCREEN
 ==================================================
 
 Implement the KYNTRA home screen according to Figma.
@@ -491,8 +485,7 @@ Match:
 - Button appearance
 - Section spacing
 
-==================================================
-13. SHOP / CATEGORY
+================================================== 13. SHOP / CATEGORY
 ==================================================
 
 Implement product browsing.
@@ -509,8 +502,7 @@ Users should be able to:
 
 Implement filtering and sorting locally using mock product data.
 
-==================================================
-14. SEARCH
+================================================== 14. SEARCH
 ==================================================
 
 Implement functional search.
@@ -541,8 +533,7 @@ Do not put API keys in the mobile application.
 
 For now, implement a mock response or local search behavior.
 
-==================================================
-15. PRODUCT DETAILS
+================================================== 15. PRODUCT DETAILS
 ==================================================
 
 Product detail screens must include whatever is present in Figma.
@@ -569,8 +560,7 @@ All buttons must actually work.
 
 Validate required selections before adding to bag.
 
-==================================================
-16. FAVORITES
+================================================== 16. FAVORITES
 ==================================================
 
 Implement favorite functionality.
@@ -584,8 +574,7 @@ Users should be able to:
 
 Persist favorites locally.
 
-==================================================
-17. SHOPPING BAG
+================================================== 17. SHOPPING BAG
 ==================================================
 
 Implement a fully functional cart.
@@ -609,8 +598,7 @@ Update totals automatically.
 
 Use proper currency formatting.
 
-==================================================
-18. CHECKOUT
+================================================== 18. CHECKOUT
 ==================================================
 
 Implement the checkout flow represented by the Figma design.
@@ -634,8 +622,7 @@ Use a safe mock payment flow.
 
 Never store real card information in local storage.
 
-==================================================
-19. ORDERS
+================================================== 19. ORDERS
 ==================================================
 
 Implement local mock order management.
@@ -652,8 +639,7 @@ Users should be able to:
 
 Persist orders locally.
 
-==================================================
-20. PROFILE
+================================================== 20. PROFILE
 ==================================================
 
 Implement the profile screen according to Figma.
@@ -674,8 +660,7 @@ Potential features:
 
 Only include what exists in the design.
 
-==================================================
-21. SETTINGS
+================================================== 21. SETTINGS
 ==================================================
 
 Implement settings shown in Figma.
@@ -695,8 +680,7 @@ Use real functional toggles where applicable.
 
 Persist settings locally.
 
-==================================================
-22. DATA ARCHITECTURE
+================================================== 22. DATA ARCHITECTURE
 ==================================================
 
 Do not hardcode product information directly inside screen components.
@@ -726,8 +710,7 @@ collection
 
 Use TypeScript interfaces/types.
 
-==================================================
-23. STATE MANAGEMENT
+================================================== 23. STATE MANAGEMENT
 ==================================================
 
 Use a simple architecture appropriate for this application.
@@ -755,8 +738,7 @@ Keep state predictable.
 
 Avoid unnecessary global state.
 
-==================================================
-24. LOCAL STORAGE
+================================================== 24. LOCAL STORAGE
 ==================================================
 
 Use an Expo-compatible persistence solution.
@@ -777,8 +759,7 @@ The application should retain important information after restarting Expo.
 
 Do not store passwords or sensitive payment information insecurely.
 
-==================================================
-25. SERVICES
+================================================== 25. SERVICES
 ==================================================
 
 Separate business logic from UI.
@@ -798,8 +779,7 @@ Initially use local/mock data.
 
 Design these services so a real backend can be added later without rewriting the UI.
 
-==================================================
-26. ASSETS
+================================================== 26. ASSETS
 ==================================================
 
 Use the actual assets from the design whenever possible.
@@ -824,8 +804,7 @@ If an asset cannot be retrieved automatically:
 
 Do not invent brand logos or copyrighted assets that aren't supplied.
 
-==================================================
-27. TYPOGRAPHY
+================================================== 27. TYPOGRAPHY
 ==================================================
 
 Typography must closely match Figma.
@@ -844,8 +823,7 @@ If the exact font is unavailable, select the closest legally available font and 
 
 Do not randomly change font sizes to make screens fit.
 
-==================================================
-28. COLORS
+================================================== 28. COLORS
 ==================================================
 
 Centralize all colors.
@@ -870,8 +848,7 @@ colors.border
 
 Use exact Figma colors whenever available.
 
-==================================================
-29. ICONS
+================================================== 29. ICONS
 ==================================================
 
 Use the correct icon style from the Figma design.
@@ -884,8 +861,7 @@ If they are standard icons, use an Expo-compatible icon library already installe
 
 Avoid adding a dependency when the existing project already provides suitable icons.
 
-==================================================
-30. ANIMATIONS
+================================================== 30. ANIMATIONS
 ==================================================
 
 Use animations only where they improve the experience or match Figma.
@@ -903,8 +879,7 @@ Do not add excessive animations.
 
 Performance is more important than unnecessary visual effects.
 
-==================================================
-31. ACCESSIBILITY
+================================================== 31. ACCESSIBILITY
 ==================================================
 
 Implement basic accessibility.
@@ -921,8 +896,7 @@ Do not rely only on color to communicate state.
 
 Text should remain readable.
 
-==================================================
-32. LOADING / ERROR / EMPTY STATES
+================================================== 32. LOADING / ERROR / EMPTY STATES
 ==================================================
 
 Every asynchronous or data-dependent screen should have appropriate states.
@@ -945,8 +919,7 @@ Product error
 
 These states should follow the KYNTRA visual system.
 
-==================================================
-33. PERFORMANCE
+================================================== 33. PERFORMANCE
 ==================================================
 
 Optimize the application.
@@ -965,8 +938,7 @@ Do not optimize prematurely.
 
 Prioritize clean, maintainable code.
 
-==================================================
-34. ERROR HANDLING
+================================================== 34. ERROR HANDLING
 ==================================================
 
 Handle errors gracefully.
@@ -983,8 +955,7 @@ Do not expose technical errors directly to users.
 
 During development, log useful debugging information.
 
-==================================================
-35. ANDROID / EXPO REQUIREMENTS
+================================================== 35. ANDROID / EXPO REQUIREMENTS
 ==================================================
 
 The project must work with Expo Go.
@@ -1000,8 +971,7 @@ For any feature requiring native code:
 3. If incompatible, provide an Expo-compatible fallback.
 4. Explain any limitation.
 
-==================================================
-36. BARCODE SCANNER
+================================================== 36. BARCODE SCANNER
 ==================================================
 
 If the Figma design includes barcode scanning:
@@ -1020,8 +990,7 @@ with a mock/demo scanner flow.
 
 Do not break the application because of unsupported native functionality.
 
-==================================================
-37. AI FEATURES
+================================================== 37. AI FEATURES
 ==================================================
 
 If the design includes an AI assistant or Ask AI feature:
@@ -1044,8 +1013,7 @@ inside the mobile app.
 
 The service should be replaceable with a real backend later.
 
-==================================================
-38. AUTHENTICATION
+================================================== 38. AUTHENTICATION
 ==================================================
 
 If authentication screens exist:
@@ -1065,8 +1033,7 @@ Clearly separate mock authentication from the UI.
 
 Design it so a real backend can replace it later.
 
-==================================================
-39. CODE QUALITY
+================================================== 39. CODE QUALITY
 ==================================================
 
 Use TypeScript.
@@ -1087,8 +1054,7 @@ Use comments only where they provide real value.
 
 Do not write unnecessary comments explaining obvious code.
 
-==================================================
-40. FILE STRUCTURE
+================================================== 40. FILE STRUCTURE
 ==================================================
 
 Use a maintainable structure similar to:
@@ -1096,21 +1062,20 @@ Use a maintainable structure similar to:
 app/
 components/
 src/
-  components/
-  theme/
-  data/
-  services/
-  state/
-  hooks/
-  utils/
-  types/
-  constants/
+components/
+theme/
+data/
+services/
+state/
+hooks/
+utils/
+types/
+constants/
 assets/
 
 Adapt the structure to the existing repository rather than blindly replacing it.
 
-==================================================
-41. DO NOT BREAK EXISTING PROJECT
+================================================== 41. DO NOT BREAK EXISTING PROJECT
 ==================================================
 
 Before changing configuration:
@@ -1131,8 +1096,7 @@ Do not randomly upgrade all packages.
 
 Do not delete working files without understanding their purpose.
 
-==================================================
-42. DEVELOPMENT PROCESS
+================================================== 42. DEVELOPMENT PROCESS
 ==================================================
 
 Follow this exact development process.
@@ -1277,8 +1241,7 @@ Remove:
 
 Run lint/type checks.
 
-==================================================
-43. VISUAL QA RULE
+================================================== 43. VISUAL QA RULE
 ==================================================
 
 Do not declare the app finished simply because it compiles.
@@ -1301,8 +1264,7 @@ For each important screen verify:
 
 If something does not match Figma, fix it.
 
-==================================================
-44. TESTING CHECKLIST
+================================================== 44. TESTING CHECKLIST
 ==================================================
 
 Test all of the following:
@@ -1338,8 +1300,7 @@ Test all of the following:
 [ ] No secrets in source code
 [ ] No temporary Figma URLs in final code
 
-==================================================
-45. IMPORTANT DEVELOPMENT BEHAVIOR
+================================================== 45. IMPORTANT DEVELOPMENT BEHAVIOR
 ==================================================
 
 Do not generate the entire project blindly in one step.
@@ -1364,8 +1325,7 @@ When Figma does not specify something:
 
 Choose the simplest implementation consistent with the existing KYNTRA design language.
 
-==================================================
-46. NEVER DO THESE THINGS
+================================================== 46. NEVER DO THESE THINGS
 ==================================================
 
 DO NOT:
@@ -1388,8 +1348,7 @@ DO NOT:
 - Leave temporary development URLs
 - Use random stock imagery when the actual design asset is available
 
-==================================================
-47. FINAL ACCEPTANCE CRITERIA
+================================================== 47. FINAL ACCEPTANCE CRITERIA
 ==================================================
 
 The project is considered complete only when:
@@ -1417,8 +1376,7 @@ The project is considered complete only when:
 21. The implementation is maintainable.
 22. The application can later be connected to a real backend.
 
-==================================================
-48. FIRST ACTION
+================================================== 48. FIRST ACTION
 ==================================================
 
 DO NOT start by writing random screens.

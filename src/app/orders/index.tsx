@@ -6,7 +6,7 @@ import { Badge } from '@/components/ProductCard';
 import { Button } from '@/components/Button';
 import { EmptyState } from '@/components/Screen';
 import { Text } from '@/components/Text';
-import { products } from '@/data/products';
+import { listProducts } from '@/services/db';
 import { useOrders } from '@/state';
 import { colors, PAGE_MARGIN, radius, spacing } from '@/theme';
 import type { OrderStatus } from '@/types';
@@ -37,6 +37,10 @@ export default function Orders() {
     return <View style={{ flex: 1, backgroundColor: colors.background }} />;
   }
 
+  // One query per render, not one per order line: `listProducts()` is a SQL
+  // read, and the flatMap below would otherwise issue it once per item.
+  const catalogue = listProducts();
+
   return (
     <ScrollView style={{ flex: 1, backgroundColor: colors.background }}>
       <View style={{ paddingHorizontal: PAGE_MARGIN, paddingVertical: spacing.lg }}>
@@ -47,7 +51,7 @@ export default function Orders() {
         orders.map((order) => {
           // Order lines reference products by id; skip any that no longer exist.
           const items = order.items.flatMap((item) => {
-            const product = products.find((p) => p.id === item.productId);
+            const product = catalogue.find((p) => p.id === item.productId);
             return product ? [{ ...item, product }] : [];
           });
 

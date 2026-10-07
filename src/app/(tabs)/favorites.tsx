@@ -6,7 +6,7 @@ import { Button } from '@/components/Button';
 import { ProductGridList } from '@/components/ProductCard';
 import { EmptyState } from '@/components/Screen';
 import { Text } from '@/components/Text';
-import { products } from '@/data/products';
+import { listProducts } from '@/services/db';
 import { useTabBarClearance } from '@/components/TabBar';
 import { useFavorites } from '@/state';
 import { colors, PAGE_MARGIN, spacing } from '@/theme';
@@ -27,13 +27,12 @@ export default function Favorites() {
   // catalogue — that keeps the saved order stable across launches.
   // Memoised on `ids` because the provider hands back a stable array reference;
   // without this a new array identity each render would re-render every tile.
-  const saved = useMemo(
-    () =>
-      ids
-        .map((id) => products.find((p) => p.id === id))
-        .filter((p): p is NonNullable<typeof p> => p != null),
-    [ids]
-  );
+  const saved = useMemo(() => {
+    const catalogue = listProducts();
+    return ids
+      .map((id) => catalogue.find((p) => p.id === id))
+      .filter((p): p is NonNullable<typeof p> => p != null);
+  }, [ids]);
 
   if (hydrating) {
     return <View style={{ flex: 1, backgroundColor: colors.background }} />;

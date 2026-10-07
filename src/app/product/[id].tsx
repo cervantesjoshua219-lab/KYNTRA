@@ -102,11 +102,28 @@ function ProductBody({ product, related }: { product: Product; related: Product[
               backgroundColor: colors.secondary,
             }}
           >
-            <Image
-              source={product.images[imageIndex]}
-              style={{ width: '100%', height: '100%' }}
-              contentFit="cover"
-            />
+            {product.images[imageIndex] ? (
+              <Image
+                source={product.images[imageIndex]}
+                style={{ width: '100%', height: '100%' }}
+                contentFit="cover"
+              />
+            ) : (
+              /* Items added from the Inventory screen have no photograph. */
+              <View
+                style={{
+                  flex: 1,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: spacing.sm,
+                }}
+              >
+                <Icon name="package" size={28} color={colors.secondaryText} />
+                <Text variant="label" tone="secondary">
+                  No photo yet
+                </Text>
+              </View>
+            )}
           </View>
 
           {product.images.length > 1 ? (

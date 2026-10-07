@@ -1,32 +1,49 @@
-import { categories, collections, findCategory, findProduct, products } from '@/data/products';
+import { collections, SPORT_FILTERS } from '@/data/products';
 import { reviews } from '@/data/content';
+import { findProduct, listCategories, listProducts, searchProducts } from '@/services/db';
 import type { Category, Product, SearchResult } from '@/types';
 import { delay } from '@/utils';
 
 /**
  * Catalogue access.
  *
- * All reads are async and deliberately delayed so every screen's loading state
- * is exercised in development rather than only in production.
+ * Every read below resolves against SQLite (`src/services/db.ts`), not against
+ * the seed array — `seedProducts` is INSERTed on first launch and then never
+ * consulted again. The artificial `delay` is kept on purpose so screens still
+ * exercise their loading states honestly.
  */
+
+function sportsList(): Category[] {
+  const live = listProducts();
+  return SPORT_FILTERS.map((name) => ({
+    id: name.toLowerCase(),
+    name,
+    // Counted from the live table, not typed in: the hand-maintained numbers
+    // drifted out of step with the products and mislabelled the chips, and now
+    // an item added in the lab updates the count too.
+    count: live.filter((p) => p.sport === name).length,
+    image: null,
+  }));
+}
 
 export const productService = {
   async listAll(): Promise<Product[]> {
-    return delay(products);
+    return delay(listProducts());
   },
 
   async listFeatured(): Promise<Product[]> {
-    return delay(products.filter((p) => p.featured));
+    return delay(listProducts().filter((p) => p.featured));
   },
 
+  /** `id` is a sport chip id (`running`), so it filters on `sport`. */
   async listByCategory(categoryId: string): Promise<Product[]> {
-    const category = findCategory(categoryId);
-    if (!category) return delay([]);
-    return delay(products.filter((p) => p.category === category.name));
+    const match = SPORT_FILTERS.find((name) => name.toLowerCase() === categoryId);
+    if (!match) return delay([]);
+    return delay(listProducts().filter((p) => p.sport === match));
   },
 
   async listByCollection(collectionId: string): Promise<Product[]> {
-    return delay(products.filter((p) => p.collection === collectionId));
+    return delay(listProducts().filter((p) => p.collection === collectionId));
   },
 
   async getById(id: string): Promise<Product | null> {
@@ -34,7 +51,12 @@ export const productService = {
   },
 
   async getCategories(): Promise<Category[]> {
-    return delay(categories);
+    return delay(sportsList());
+  },
+
+  /** Categories actually present in the table, for the Add Item form. */
+  async getMerchCategories(): Promise<string[]> {
+    return delay(listCategories());
   },
 
   async getCollections() {
@@ -43,7 +65,9 @@ export const productService = {
 
   async getRelated(product: Product): Promise<Product[]> {
     return delay(
-      products.filter((p) => p.id !== product.id && p.category === product.category).slice(0, 4),
+      listProducts()
+        .filter((p) => p.id !== product.id && p.category === product.category)
+        .slice(0, 4),
     );
   },
 
@@ -51,17 +75,9 @@ export const productService = {
     return delay(reviews[productId] ?? []);
   },
 
-  /** Text search across name, tagline and category. */
+  /** SQL search — parameterised `LIKE` across name, tagline and category. */
   async search(query: string): Promise<Product[]> {
-    const q = query.trim().toLowerCase();
-    if (!q) return delay([]);
-    return delay(
-      products.filter((p) =>
-        [p.name, p.tagline, p.category, p.description].some((field) =>
-          field.toLowerCase().includes(q),
-        ),
-      ),
-    );
+    return delay(searchProducts(query));
   },
 
   /** Sort options shown in the Sort bottom sheet (Figma 9:1437). */

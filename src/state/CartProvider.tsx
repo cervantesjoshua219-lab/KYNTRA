@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useReducer, useState } from 'react';
 import type { Dispatch, ReactNode } from 'react';
 
-import { findProduct } from '@/data/products';
+import { findProduct } from '@/services/db';
 import { readJson, storageKeys, writeJson } from '@/services/storage';
 import type { CartItem, Product, Totals } from '@/types';
 import { cartLineId } from '@/utils';

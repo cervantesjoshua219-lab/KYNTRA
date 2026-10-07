@@ -1,11 +1,14 @@
-import type { Category, Product } from '@/types';
+import type { Product } from '@/types';
 import { campaignImages, productPhotos } from './images';
 
 /**
- * Mock catalogue.
+ * Seed catalogue — the first-run content for `src/services/db.ts`.
  *
- * There is no backend. `productService` serves this data with a short delay so
- * screens exercise their loading states honestly.
+ * **This array is not read by any screen.** `getDatabase()` INSERTs it when the
+ * `products` table is empty and from then on the table is the source of truth;
+ * an edit made in the app has to survive a reload, which a module-level array
+ * cannot do. It lives here rather than in `db.ts` because it is content, not
+ * schema, and because this file stays the one place the Figma copy is recorded.
  *
  * **These six products are the complete set Figma actually depicts.** Every
  * name, tagline, peso price, original price, badge and rating below was read
@@ -30,7 +33,7 @@ const NEUTRALS = [
   { name: 'Onyx', hex: '#111111' },
 ];
 
-export const products: Product[] = [
+export const seedProducts: Product[] = [
   {
     id: 'paceform-01',
     name: 'Paceform 01',
@@ -145,15 +148,6 @@ export const products: Product[] = [
  */
 export const SPORT_FILTERS = ['Running', 'Training', 'Lifestyle', 'Basketball'] as const;
 
-export const categories: Category[] = SPORT_FILTERS.map((name) => ({
-  id: name.toLowerCase(),
-  name,
-  // Counted from the catalogue rather than typed in. The hand-maintained
-  // numbers drifted out of step with the products and mislabelled the chips.
-  count: products.filter((p) => p.sport === name).length,
-  image: null,
-}));
-
 /**
  * Home editorial campaigns, in Figma's stacking order. Copy is verbatim from
  * the campaign message blocks at `9:737`, `9:787` and `9:880`.
@@ -181,11 +175,3 @@ export const collections = [
     image: campaignImages[2],
   },
 ];
-
-export function findProduct(id: string) {
-  return products.find((p) => p.id === id) ?? null;
-}
-
-export function findCategory(id: string) {
-  return categories.find((c) => c.id === id) ?? null;
-}

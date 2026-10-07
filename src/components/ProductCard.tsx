@@ -144,16 +144,36 @@ export const ProductCard = memo(function ProductCard({
           overflow: 'hidden',
         }}
       >
-        <Image
-          source={product.images[0]}
-          style={{ width: '100%', height: '100%' }}
-          contentFit="cover"
-          // No fade: a transition on every tile keeps the surface repainting for
-          // as long as the image is decoding, which is visible as stutter while
-          // scrolling a freshly mounted row.
-          transition={0}
-          cachePolicy="memory-disk"
-        />
+        {product.images[0] ? (
+          <Image
+            source={product.images[0]}
+            style={{ width: '100%', height: '100%' }}
+            contentFit="cover"
+            // No fade: a transition on every tile keeps the surface repainting for
+            // as long as the image is decoding, which is visible as stutter while
+            // scrolling a freshly mounted row.
+            transition={0}
+            cachePolicy="memory-disk"
+          />
+        ) : (
+          /* Items added from the Inventory screen carry no photograph — the lab's
+             form collects name, category, price and stock only. A neutral tile
+             keeps the grid from showing a blank hole where an <Image> would have
+             decoded. */
+          <View
+            style={{
+              flex: 1,
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: spacing.xs,
+            }}
+          >
+            <Icon name="package" size={22} color={colors.secondaryText} />
+            <Text variant="caption" tone="secondary">
+              No photo
+            </Text>
+          </View>
+        )}
 
         <Pressable
           onPress={toggleSaved}
