@@ -338,6 +338,32 @@ export function createProduct(input: NewProduct): Product {
   return findProduct(slug) as Product;
 }
 
+/**
+ * Updates the four editable fields by application key.
+ *
+ * The slug deliberately does not change when the name does: it is the id every
+ * cart, saved item, order and the `/product/:id` route reference, so re-keying a
+ * row on rename would orphan those references. The row keeps its identity and
+ * the screens simply render the new name.
+ */
+export function updateProduct(slug: string, input: NewProduct): Product | null {
+  const db = getDatabase();
+
+  const updated =
+    db.runSync(
+      'UPDATE products SET name = ?, category = ?, price = ?, stock = ? WHERE slug = ?',
+      [
+        input.name.trim(),
+        input.category.trim(),
+        input.price,
+        Math.max(0, Math.trunc(input.stock)),
+        slug,
+      ],
+    ).changes > 0;
+
+  return updated ? (findProduct(slug) as Product) : null;
+}
+
 /** Delete by application key. Returns whether a row actually went away. */
 export function deleteProduct(slug: string): boolean {
   return getDatabase().runSync('DELETE FROM products WHERE slug = ?', [slug]).changes > 0;

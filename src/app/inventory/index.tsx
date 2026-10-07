@@ -9,7 +9,13 @@ import { IconButton } from '@/components/IconButton';
 import { InputField } from '@/components/InputField';
 import { EmptyState } from '@/components/Screen';
 import { Text } from '@/components/Text';
-import { createProduct, deleteProduct, listCategories, searchProducts } from '@/services/db';
+import {
+  createProduct,
+  deleteProduct,
+  listCategories,
+  searchProducts,
+  updateProduct,
+} from '@/services/db';
 import { colors, PAGE_MARGIN, radius, spacing } from '@/theme';
 import type { Product } from '@/types';
 import { formatPrice } from '@/utils';
@@ -27,6 +33,7 @@ import { formatPrice } from '@/utils';
  * - the list renders `searchProducts()`, which is a parameterised `LIKE`
  * - the term is re-bound on every keystroke, so results update as you type
  * - `Add item` INSERTs and the row appears without a reload
+ * - `Edit` pre-fills the same form and UPDATEs name, category, price, stock
  * - `Delete` removes the row behind a confirmation sheet
  *
  * It uses the app's own `BottomSheet` rather than `Alert.alert` for the two
@@ -41,6 +48,7 @@ export default function Inventory() {
   const [rows, setRows] = useState<Product[]>(() => searchProducts(''));
 
   const [adding, setAdding] = useState(false);
+  const [editing, setEditing] = useState<Product | null>(null);
   const [pending, setPending] = useState<Product | null>(null);
 
   const [categories, setCategories] = useState<string[]>([]);
@@ -63,6 +71,11 @@ export default function Inventory() {
     setRows(searchProducts(term));
   }, []);
 
+  const closeSheet = useCallback(() => {
+    setAdding(false);
+    setEditing(null);
+  }, []);
+
   const openAdd = useCallback(() => {
     const options = listCategories();
     setCategories(options);
@@ -71,7 +84,23 @@ export default function Inventory() {
     setPrice('');
     setStock('');
     setErrors({});
+    setEditing(null);
     setAdding(true);
+  }, []);
+
+  /**
+   * Pre-fills the same four-field form from an existing row, then opens the
+   * sheet in edit mode. Saving UPDATEs the row in place — the slug, and with it
+   * every cart or order that references it, is untouched.
+   */
+  const openEdit = useCallback((item: Product) => {
+    setCategories(listCategories());
+    setName(item.name);
+    setCategory(item.category);
+    setPrice(String(item.price));
+    setStock(String(item.stock));
+    setErrors({});
+    setEditing(item);
   }, []);
 
   const save = useCallback(() => {
@@ -89,16 +118,22 @@ export default function Inventory() {
       return;
     }
 
-    createProduct({
+    const payload = {
       name: name.trim(),
       category,
       price: parsedPrice,
       stock: parsedStock,
-    });
+    };
 
-    setAdding(false);
+    if (editing) {
+      updateProduct(editing.id, payload);
+    } else {
+      createProduct(payload);
+    }
+
+    closeSheet();
     runSearch(query);
-  }, [category, name, price, query, runSearch, stock]);
+  }, [category, closeSheet, editing, name, price, query, runSearch, stock]);
 
   const confirmDelete = useCallback(() => {
     if (!pending) return;
@@ -164,7 +199,11 @@ export default function Inventory() {
         data={rows}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <InventoryRow item={item} onDelete={() => setPending(item)} />
+          <InventoryRow
+            item={item}
+            onEdit={() => openEdit(item)}
+            onDelete={() => setPending(item)}
+          />
         )}
         ItemSeparatorComponent={() => (
           <View style={{ height: 1, backgroundColor: colors.border, marginLeft: PAGE_MARGIN }} />
@@ -194,13 +233,18 @@ export default function Inventory() {
         contentContainerStyle={{ paddingBottom: spacing.xxxl }}
       />
 
-      {/* Add item — the lab's four fields, nothing invented beyond them. */}
+      {/* Add / Edit item — the lab's four fields, nothing invented beyond them. */}
       <BottomSheet
-        visible={adding}
-        onClose={() => setAdding(false)}
-        title="Add item"
+        visible={adding || editing !== null}
+        onClose={closeSheet}
+        title={editing ? 'Edit item' : 'Add item'}
         footer={
-          <Button label="Save item" block onPress={save} accessibilityLabel="Save item" />
+          <Button
+            label={editing ? 'Save changes' : 'Save item'}
+            block
+            onPress={save}
+            accessibilityLabel={editing ? 'Save changes' : 'Save item'}
+          />
         }
       >
         <View style={{ gap: spacing.lg, paddingBottom: spacing.lg }}>
@@ -281,10 +325,18 @@ export default function Inventory() {
 }
 
 /**
- * One inventory row: name, then category, price and stock, with the delete
- * affordance the exercise asks for on each list card.
+ * One inventory row: name, then category, price and stock, with edit and
+ * delete affordances on each list card.
  */
-function InventoryRow({ item, onDelete }: { item: Product; onDelete: () => void }) {
+function InventoryRow({
+  item,
+  onEdit,
+  onDelete,
+}: {
+  item: Product;
+  onEdit: () => void;
+  onDelete: () => void;
+}) {
   return (
     <View
       style={{
@@ -305,6 +357,15 @@ function InventoryRow({ item, onDelete }: { item: Product; onDelete: () => void 
           {item.images.length === 0 ? ' · no photo' : ''}
         </Text>
       </View>
+
+      <IconButton
+        accessibilityLabel={`Edit ${item.name}`}
+        tone="ghost"
+        onPress={onEdit}
+        style={{ width: 44, height: 44 }}
+      >
+        <Icon name="edit" size={20} color={colors.secondaryText} />
+      </IconButton>
 
       <IconButton
         accessibilityLabel={`Delete ${item.name}`}
